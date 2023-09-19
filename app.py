@@ -17,16 +17,6 @@ def hello():
     return jsonify(message='Hello from path!')
 
 
-@app.route("/")
-def index():
-    return redirect('/ping')
-
-
-@app.route("/ping")
-def ping():
-    return "pong"
-
-
 @app.errorhandler(404)
 def resource_not_found(e):
     return make_response(jsonify(error='Not found!'), 404)
