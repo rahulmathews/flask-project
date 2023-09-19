@@ -4,7 +4,7 @@ from netflix import db, routes
 
 app = Flask(__name__)
 
-app.register_blueprint(routes.netflix_api, url_prefix='/api/netflix')
+app.register_blueprint(routes.netflix_api, url_prefix='/netflix')
 
 
 @app.route("/")

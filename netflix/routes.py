@@ -5,16 +5,17 @@ from flask import redirect
 from flask import jsonify
 from flask import request
 from flask import url_for
-from bson import json_util
+from bson import ObjectId, json_util
 
 from netflix.db import get_db
 
 netflix_api = Blueprint("netflix", "netflix_api")
 
+db = get_db()
+
 
 @netflix_api.route("/", methods=["GET"])
-def index():
-    db = get_db()
+def fetch_all_movies():
     movies = []
     for movie in db['movies'].find({}):
         movies.append(movie)
@@ -24,76 +25,85 @@ def index():
     return jsonify(movies=movies)
 
 
-def get_post(id, check_author=True):
-    post = (
-        get_db()
-        .execute(
-            "SELECT p.id, title, body, created, author_id, username"
-            " FROM post p JOIN user u ON p.author_id = u.id"
-            " WHERE p.id = ?",
-            (id,),
-        )
-        .fetchone()
-    )
+@netflix_api.route("/", methods=["POST"])
+def insert_movie():
+    data = request.get_json()
+
+    req_body = {
+        "age_certification": data['age_certification'],
+        "description": data['description'],
+        "genres": data['genres'],
+        "id": data['id'],
+        "imdb_score": data['imdb_score'],
+        "production_countries": data['production_countries'],
+        "release_year": data['release_year'],
+        "runtime": data['runtime'],
+        "title": data['title'],
+        "type": data['type']
+    }
+
+    res = {}
+
+    result = db['movies'].insert_one(req_body)
+
+    res['id'] = json.loads(json_util.dumps(result.inserted_id))
+
+    return jsonify(data=res)
 
 
-@netflix_api.route("/create", methods=["GET", "POST"])
-def create():
-    """Create a new post for the current user."""
-    if request.method == "POST":
-        title = request.form["title"]
-        body = request.form["body"]
-        error = None
+@netflix_api.route("/<string:id>", methods=["PATCH"])
+def update_movie(id):
+    if "id" in request.view_args:
+        id = request.view_args['id']
 
-        if not title:
-            error = "Title is required."
+    data = request.get_json()
 
-        if error is not None:
-            flash(error)
-        else:
-            db = get_db()
-            db.execute(
-                "INSERT INTO post (title, body, author_id) VALUES (?, ?, ?)",
-                (title, body, g.user["id"]),
-            )
-            db.commit()
-            return redirect(url_for("blog.index"))
+    req_body = {}
 
+    if 'description' in data:
+        req_body['description'] = data['description']
 
-@netflix_api.route("/<int:id>/update", methods=["GET", "POST"])
-def update(id):
-    """Update a post if the current user is the author."""
-    post = get_post(id)
+    if 'id' in data:
+        req_body['id'] = data['id']
 
-    if request.method == "POST":
-        title = request.form["title"]
-        body = request.form["body"]
-        error = None
+    if 'imdb_score' in data:
+        req_body['imdb_score'] = data['imdb_score']
 
-        if not title:
-            error = "Title is required."
+    if 'runtime' in data:
+        req_body['runtime'] = data['runtime']
 
-        if error is not None:
-            flash(error)
-        else:
-            db = get_db()
-            db.execute(
-                "UPDATE post SET title = ?, body = ? WHERE id = ?", (
-                    title, body, id)
-            )
-            db.commit()
-            return redirect(url_for("blog.index"))
+    if 'title' in data:
+        req_body['title'] = data['title']
+
+    result = db['movies'].find_one_and_update(
+        {"_id": ObjectId(id)}, {"$set": req_body}, new=True)
+
+    res = json.loads(json_util.dumps(result))
+
+    return jsonify(data=res)
 
 
-@netflix_api.route("/<int:id>/delete", methods=["POST",])
-def delete(id):
-    """Delete a post.
+@netflix_api.route("/<string:id>", methods=["DELETE"])
+def delete_movie(id):
+    if "id" in request.view_args:
+        id = request.view_args['id']
 
-    Ensures that the post exists and that the logged in user is the
-    author of the post.
-    """
-    get_post(id)
-    db = get_db()
-    db.execute("DELETE FROM post WHERE id = ?", (id,))
-    db.commit()
-    return redirect(url_for("blog.index"))
+    result = db['movies'].find_one_and_delete(
+        {"_id": ObjectId(id)})
+
+    res = json.loads(json_util.dumps(result))
+
+    return jsonify(data=res)
+
+
+@netflix_api.route("/<string:id>", methods=["GET"])
+def fetch_movie(id):
+    if "id" in request.view_args:
+        id = request.view_args['id']
+
+    result = db['movies'].find_one(
+        {"_id": ObjectId(id)})
+
+    res = json.loads(json_util.dumps(result))
+
+    return jsonify(data=res)
