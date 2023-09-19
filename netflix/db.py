@@ -1,3 +1,5 @@
+import os
+
 from pymongo import MongoClient
 
 
@@ -7,7 +9,10 @@ def get_db():
 
 
 try:
-    mongoClient = MongoClient('localhost', 27017)
+    if 'MONGO_URI' in os.environ:
+        mongoClient = MongoClient(os.environ['MONGO_URI'])
+    else:
+        mongoClient = MongoClient('localhost:27017')
 
     db = mongoClient.netflix
 
