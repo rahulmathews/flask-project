@@ -11,12 +11,15 @@ custom:
 provider:
   name: aws
   runtime: python3.9
+  environment:
+    MONGO_URI: ${param:MONGO_URI}
+  memorySize: 128
+  timeout: 30
 
 functions:
   api:
     handler: wsgi_handler.handler
-    events:
-      - httpApi: "*"
+    url: true
 
 plugins:
   - serverless-wsgi
