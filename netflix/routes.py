@@ -29,18 +29,37 @@ def fetch_all_movies():
 def insert_movie():
     data = request.get_json()
 
-    req_body = {
-        "age_certification": data['age_certification'],
-        "description": data['description'],
-        "genres": data['genres'],
-        "id": data['id'],
-        "imdb_score": data['imdb_score'],
-        "production_countries": data['production_countries'],
-        "release_year": data['release_year'],
-        "runtime": data['runtime'],
-        "title": data['title'],
-        "type": data['type']
-    }
+    req_body = {}
+
+    if 'age_certification' in data:
+        req_body['age_certification'] = data['age_certification']
+
+    if 'description' in data:
+        req_body['description'] = data['description']
+
+    if 'genres' in data:
+        req_body['genres'] = data['genres']
+
+    if 'id' in data:
+        req_body['id'] = data['id']
+
+    if 'imdb_score' in data:
+        req_body['imdb_score'] = data['imdb_score']
+
+    if 'production_countries' in data:
+        req_body['production_countries'] = data['production_countries']
+
+    if 'release_year' in data:
+        req_body['release_year'] = data['release_year']
+
+    if 'runtime' in data:
+        req_body['runtime'] = data['runtime']
+
+    if 'title' in data:
+        req_body['title'] = data['title']
+
+    if 'type' in data:
+        req_body['type'] = data['type']
 
     res = {}
 

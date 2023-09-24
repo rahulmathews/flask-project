@@ -8,6 +8,8 @@ def get_db():
         return db
 
 
+print("MONGO_URI....", os.environ['MONGO_URI'])
+
 try:
     if 'MONGO_URI' in os.environ:
         mongoClient = MongoClient(os.environ['MONGO_URI'])
