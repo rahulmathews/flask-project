@@ -1,10 +1,10 @@
 from flask import Flask, jsonify, make_response, redirect
-from netflix import db, routes
+from imdb import routes
 
 
 app = Flask(__name__)
 
-app.register_blueprint(routes.netflix_api, url_prefix='/netflix')
+app.register_blueprint(routes.imdb_api, url_prefix='/imdb')
 
 
 @app.route("/")

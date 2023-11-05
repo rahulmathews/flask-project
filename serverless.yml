@@ -1,6 +1,6 @@
 org: rahulmathews
-app: aws-flask-lambda
-service: aws-flask-lambda
+app: aws-flask-service
+service: aws-flask-service
 
 frameworkVersion: "3"
 
@@ -12,7 +12,10 @@ provider:
   name: aws
   runtime: python3.9
   environment:
-    MONGO_URI: ${param:MONGO_URI}
+    NEO4J_URI: ${param:NEO4J_URI}
+    NEO4J_USER: ${param:NEO4J_USER}
+    NEO4J_PASSWORD: ${param:NEO4J_PASSWORD}
+    NEO4J_DATABASE: ${param:NEO4J_DATABASE}
   memorySize: 128
   timeout: 30
 
