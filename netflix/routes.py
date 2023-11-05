@@ -128,33 +128,3 @@ def fetch_movie(id):
     res = json.loads(json_util.dumps(result))
 
     return jsonify(data=res)
-
-
-@netflix_api.route("/imdb", methods=["GET"])
-def fetch_table():
-    query = list(
-  {
-    "$group":
-     
-      {
-        "_id": "$imdb_score",
-        "count": {
-          "$sum": 1,
-        },
-      },
-  },
-  {
-   "$sort":
-      {
-        _id: -1,
-      },
-  }]
-  
-    for movie in db['movies'].aggregate(query):
-        movies.append(movie)
-
-    movies = json.loads(json_util.dumps(movies))
-
-
-
-    return render_template('./imdb.html')
