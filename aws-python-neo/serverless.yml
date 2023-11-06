@@ -1,6 +1,6 @@
 org: rahulmathews
-app: aws-flask-service
-service: aws-flask-service
+app: aws-python-neo
+service: aws-python-neo
 
 frameworkVersion: "3"
 
